@@ -38,3 +38,7 @@ The built static files are written to `dist/`.
 - Root directory: `/`
 
 Then attach the custom domain `lonestarsportsfoundation.org` to the Pages project after verifying the `pages.dev` preview.
+
+## Deployment note
+
+After connecting the GitHub repository to Cloudflare Pages, any new commit pushed to the tracked branch will trigger a fresh Pages build and deployment.
