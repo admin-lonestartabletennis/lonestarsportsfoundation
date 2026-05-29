@@ -66,8 +66,9 @@ a {
 }
 
 .brand-logo {
-  width: 72px;
+  width: 88px;
   height: auto;
+  flex: 0 0 auto;
 }
 
 .brand-text,
@@ -292,7 +293,7 @@ a {
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 24px;
 }
 
@@ -321,6 +322,125 @@ a {
 .info-card p,
 .notice-card p {
   margin: 0 0 12px;
+}
+
+.story-photo {
+  margin: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.story-photo img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.story-photo figcaption {
+  padding: 16px 22px 20px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.program-tree {
+  position: relative;
+  display: grid;
+  gap: 42px;
+}
+
+.program-root {
+  position: relative;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 30px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.program-root::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -42px;
+  width: 2px;
+  height: 42px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.program-root h2 {
+  margin: 0;
+}
+
+.program-branches {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  padding-top: 38px;
+}
+
+.program-branches::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  background: var(--accent);
+}
+
+.program-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.program-card::before {
+  content: "";
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  width: 2px;
+  height: 38px;
+  background: var(--accent);
+}
+
+.program-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.program-card div {
+  padding: 26px;
+}
+
+.program-card h3 {
+  margin: 0 0 12px;
+  font-family: "Oswald", sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.program-card p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted);
 }
 
 .text-link {
@@ -403,7 +523,8 @@ a {
   .site-nav,
   .section-grid,
   .card-grid,
-  .info-grid {
+  .info-grid,
+  .program-branches {
     grid-template-columns: 1fr;
   }
 
@@ -420,5 +541,19 @@ a {
 
   .hero {
     min-height: 70vh;
+  }
+
+  .brand-logo {
+    width: 78px;
+  }
+
+  .program-root::after,
+  .program-branches::before,
+  .program-card::before {
+    display: none;
+  }
+
+  .program-branches {
+    padding-top: 0;
   }
 }
