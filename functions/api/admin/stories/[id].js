@@ -31,9 +31,11 @@ export async function onRequestPut(context) {
   const publishedAt = status === "published" ? (current.published_at || now) : null;
   try {
     await context.env.DB.prepare(
-      `UPDATE stories SET slug=?, title=?, summary=?, body=?, impact=?, event_date=?, location=?, status=?, cover_key=?, cover_alt=?, updated_at=?, published_at=?, updated_by=? WHERE id=?`
+      `UPDATE stories SET slug=?, title=?, summary=?, body=?, impact=?, event_date=?, location=?, status=?, cover_key=?, cover_alt=?, cover_focal_x=?, cover_focal_y=?, updated_at=?, published_at=?, updated_by=? WHERE id=?`
     ).bind(slug, title, summary, cleanText(input.body), cleanText(input.impact, 3000), cleanText(input.event_date, 30) || null,
-      cleanText(input.location, 160) || null, status, coverKey, cleanText(input.cover_alt, 240), now, publishedAt, auth.email, current.id).run();
+      cleanText(input.location, 160) || null, status, coverKey, cleanText(input.cover_alt, 240),
+      Math.min(100, Math.max(0, Number(input.cover_focal_x) || 50)), Math.min(100, Math.max(0, Number(input.cover_focal_y) || 50)),
+      now, publishedAt, auth.email, current.id).run();
     const story = await storyOr404(context.env, current.id);
     return json({ story: storySummary(story) });
   } catch (exception) {

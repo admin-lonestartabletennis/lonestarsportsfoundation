@@ -50,6 +50,21 @@
             <section class="media-editor" id="media-editor" hidden>
               <div><p class="eyebrow eyebrow-red">Photos</p><h3>Cover image &amp; gallery</h3><p>The cover appears in the rotating impact hero. Upload additional photos to create a blog-style gallery.</p></div>
               <div class="upload-box"><label>Image file<input id="image-file" type="file" accept="image/jpeg,image/png,image/webp" /></label><label>Alt text<input id="image-alt" maxlength="240" placeholder="Describe the photo for visitors" /></label><label>Caption <span class="optional">optional</span><input id="image-caption" maxlength="600" placeholder="What is happening in this photo?" /></label><div class="upload-actions"><label class="checkbox-label"><input id="is-cover" type="checkbox" /> Use as cover image</label><button class="button button-small" id="upload-image" type="button">Upload photo</button></div><p class="upload-help">JPG, PNG, or WebP, up to 8 MB.</p></div>
+              <section class="hero-framing" id="hero-framing" hidden>
+                <div>
+                  <p class="eyebrow eyebrow-red">Hero framing</p>
+                  <h3>Keep the important part in view.</h3>
+                  <p>Move the focus point to control how the cover image is cropped in the public story hero. Save the story when the preview looks right.</p>
+                </div>
+                <div class="hero-framing-controls">
+                  <figure class="hero-framing-preview"><img id="hero-framing-preview" alt="Cover image crop preview" /></figure>
+                  <div class="focal-controls">
+                    <label>Horizontal focus <output id="cover-focal-x-output">50%</output><input id="cover-focal-x" type="range" min="0" max="100" value="50" /></label>
+                    <label>Vertical focus <output id="cover-focal-y-output">50%</output><input id="cover-focal-y" type="range" min="0" max="100" value="50" /></label>
+                    <p>For this image, move the vertical focus lower to bring the players into the hero.</p>
+                  </div>
+                </div>
+              </section>
               <div id="gallery" class="admin-gallery"></div>
             </section>
           </form>

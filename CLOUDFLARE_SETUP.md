@@ -2,6 +2,10 @@
 
 The site now includes a protected editorial area at `/login` (redirects to `/admin/`), public story pages at `/impact/stories/<slug>`, and Pages Functions that store story data in D1 and photos in R2.
 
+## Existing database update
+
+If you created `lsf-impact` before the hero framing controls were added, open the D1 **Console** and run [`db/migrations/002_add_story_cover_focal_point.sql`](./db/migrations/002_add_story_cover_focal_point.sql) once before deploying this update. New databases created with [`db/schema.sql`](./db/schema.sql) already include these columns.
+
 ## 1. Create the data services
 
 In the Cloudflare dashboard, select the same account that owns `lonestarsportsfoundation.org`.

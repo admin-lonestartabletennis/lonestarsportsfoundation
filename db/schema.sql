@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS stories (
   status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft', 'published')),
   cover_key TEXT,
   cover_alt TEXT NOT NULL DEFAULT '',
+  cover_focal_x INTEGER NOT NULL DEFAULT 50,
+  cover_focal_y INTEGER NOT NULL DEFAULT 50,
   published_at TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,

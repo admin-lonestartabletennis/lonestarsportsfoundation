@@ -854,6 +854,16 @@ a {
 .checkbox-label input { width: auto; }
 .optional { color: var(--muted); font-weight: 400; }
 .upload-help { grid-column: span 2; margin: 0; font-size: 0.86rem; }
+.hero-framing { display: grid; gap: 18px; padding: 22px; border: 1px solid rgba(198, 40, 40, 0.2); border-radius: 16px; background: rgba(198, 40, 40, 0.035); }
+.hero-framing h3 { font-size: 1.55rem; }
+.hero-framing-controls { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(230px, 0.8fr); gap: 22px; align-items: center; }
+.hero-framing-preview { min-height: 220px; margin: 0; overflow: hidden; border-radius: 12px; background: #141920; }
+.hero-framing-preview img { width: 100%; height: 220px; object-fit: cover; }
+.focal-controls { display: grid; gap: 18px; }
+.focal-controls label { display: grid; grid-template-columns: 1fr auto; gap: 8px; color: var(--ink); font-size: 0.9rem; font-weight: 700; }
+.focal-controls output { color: var(--accent); }
+.focal-controls input { grid-column: span 2; width: 100%; accent-color: var(--accent); }
+.focal-controls p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
 .admin-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .admin-photo { margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; }
 .admin-photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
@@ -923,6 +933,10 @@ a {
 
   .story-gallery,
   .admin-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-framing-controls {
     grid-template-columns: 1fr;
   }
 

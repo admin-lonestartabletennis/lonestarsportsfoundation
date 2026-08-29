@@ -5,6 +5,7 @@ const form = document.querySelector("#story-form");
 const notice = document.querySelector("#notice");
 const storyList = document.querySelector("#story-list");
 const mediaEditor = document.querySelector("#media-editor");
+const heroFraming = document.querySelector("#hero-framing");
 const fields = ["title", "slug", "summary", "event-date", "location", "status", "body", "impact"];
 let stories = [];
 let currentStory = null;
@@ -41,7 +42,7 @@ async function refreshList() {
 }
 
 function resetForm() {
-  form.reset(); currentStory = null; setValue("story-id"); mediaEditor.hidden = true;
+  form.reset(); currentStory = null; setValue("story-id"); mediaEditor.hidden = true; heroFraming.hidden = true;
   document.querySelector("#form-heading").textContent = "New draft";
   document.querySelector("#delete-story").hidden = true; renderList(); message("");
 }
@@ -50,8 +51,26 @@ async function openStory(id) {
   try {
     const { story } = await request(`${api}/stories/${id}`);
     currentStory = story; setValue("story-id", story.id); setValue("title", story.title); setValue("slug", story.slug); setValue("summary", story.summary); setValue("event-date", story.event_date); setValue("location", story.location); setValue("status", story.status); setValue("body", story.body); setValue("impact", story.impact);
-    document.querySelector("#form-heading").textContent = story.title; document.querySelector("#delete-story").hidden = false; mediaEditor.hidden = false; renderList(); renderGallery(story); message("");
+    setValue("cover-focal-x", story.cover_focal_x ?? 50); setValue("cover-focal-y", story.cover_focal_y ?? 50);
+    document.querySelector("#form-heading").textContent = story.title; document.querySelector("#delete-story").hidden = false; mediaEditor.hidden = false; renderList(); renderGallery(story); renderHeroFraming(story); message("");
   } catch (err) { message(err.message, "is-error"); }
+}
+
+function updateHeroPreview() {
+  const x = value("cover-focal-x") || "50";
+  const y = value("cover-focal-y") || "50";
+  document.querySelector("#cover-focal-x-output").textContent = `${x}%`;
+  document.querySelector("#cover-focal-y-output").textContent = `${y}%`;
+  document.querySelector("#hero-framing-preview").style.objectPosition = `${x}% ${y}%`;
+}
+
+function renderHeroFraming(story) {
+  if (!story.cover_key) { heroFraming.hidden = true; return; }
+  heroFraming.hidden = false;
+  const preview = document.querySelector("#hero-framing-preview");
+  preview.src = `/media/${story.cover_key}`;
+  preview.alt = story.cover_alt || "Cover image crop preview";
+  updateHeroPreview();
 }
 
 function renderGallery(story) {
@@ -60,7 +79,7 @@ function renderGallery(story) {
   gallery.querySelectorAll(".remove-image").forEach((button) => button.addEventListener("click", async () => { if (!confirm("Remove this photo from the story?")) return; try { await request(`${api}/images/${button.dataset.imageId}`, { method: "DELETE" }); await openStory(currentStory.id); message("Photo removed.", "is-success"); } catch (err) { message(err.message, "is-error"); } }));
 }
 
-function payload() { return { title: value("title"), slug: value("slug"), summary: value("summary"), event_date: value("event-date"), location: value("location"), status: value("status"), body: value("body"), impact: value("impact") }; }
+function payload() { return { title: value("title"), slug: value("slug"), summary: value("summary"), event_date: value("event-date"), location: value("location"), status: value("status"), body: value("body"), impact: value("impact"), cover_focal_x: Number(value("cover-focal-x") || 50), cover_focal_y: Number(value("cover-focal-y") || 50) }; }
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -71,6 +90,8 @@ form.addEventListener("submit", async (event) => {
 });
 
 document.querySelector("#new-story").addEventListener("click", resetForm);
+document.querySelector("#cover-focal-x").addEventListener("input", updateHeroPreview);
+document.querySelector("#cover-focal-y").addEventListener("input", updateHeroPreview);
 document.querySelector("#delete-story").addEventListener("click", async () => { if (!currentStory || !confirm(`Delete “${currentStory.title}” and all of its photos? This cannot be undone.`)) return; try { await request(`${api}/stories/${currentStory.id}`, { method: "DELETE" }); await refreshList(); resetForm(); message("Story deleted.", "is-success"); } catch (err) { message(err.message, "is-error"); } });
 document.querySelector("#upload-image").addEventListener("click", async () => { const file = document.querySelector("#image-file").files[0]; if (!file || !currentStory) return message("Choose an image first.", "is-error"); const data = new FormData(); data.append("image", file); data.append("story_id", currentStory.id); data.append("alt_text", value("image-alt")); data.append("caption", value("image-caption")); data.append("is_cover", document.querySelector("#is-cover").checked); try { await request(`${api}/media`, { method: "POST", body: data }); document.querySelector("#image-file").value = ""; setValue("image-alt"); setValue("image-caption"); document.querySelector("#is-cover").checked = false; await openStory(currentStory.id); await refreshList(); message("Photo uploaded.", "is-success"); } catch (err) { message(err.message, "is-error"); } });
 
