@@ -4,6 +4,10 @@ import { resolve } from 'node:path';
 export default defineConfig({
   build: {
     rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) =>
+          assetInfo.name?.endsWith('.css') ? 'assets/styles.css' : 'assets/[name]-[hash][extname]'
+      },
       input: {
         main: resolve(__dirname, 'index.html'),
         about: resolve(__dirname, 'about/index.html'),
