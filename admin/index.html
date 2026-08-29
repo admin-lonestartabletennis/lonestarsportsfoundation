@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Impact Studio | Lonestar Sports Foundation</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/admin/studio.js"></script>
+  </head>
+  <body class="admin-body">
+    <header class="admin-header">
+      <div class="shell admin-header-row">
+        <a class="brand" href="/" aria-label="Lonestar Sports Foundation home">
+          <img class="brand-logo" src="/logo.png" alt="Lonestar Sports Foundation logo" />
+          <span class="brand-text">Impact <span>Studio</span></span>
+        </a>
+        <a class="text-link" href="/impact/">View public impact page</a>
+      </div>
+    </header>
+    <main class="shell admin-shell">
+      <div class="admin-intro">
+        <div><p class="eyebrow eyebrow-red">Staff publishing</p><h1>Share the stories behind the support.</h1></div>
+        <p id="editor-status">Checking your editor access…</p>
+      </div>
+      <p class="admin-notice" id="notice" role="status"></p>
+      <div class="studio-layout">
+        <aside class="story-list-panel">
+          <button class="button button-small" id="new-story" type="button">+ New story</button>
+          <div id="story-list" class="admin-story-list" aria-label="Your stories"></div>
+        </aside>
+        <section class="editor-panel">
+          <form id="story-form" class="story-form">
+            <div class="editor-panel-heading"><div><p class="eyebrow eyebrow-red">Story editor</p><h2 id="form-heading">New draft</h2></div><div class="form-actions"><button class="button button-small" type="submit">Save story</button><button class="button button-small button-danger" id="delete-story" type="button" hidden>Delete story</button></div></div>
+            <input id="story-id" type="hidden" />
+            <div class="form-grid">
+              <label>Story title<input id="title" name="title" maxlength="140" required placeholder="e.g. Youth Table Tennis Summer Camp" /></label>
+              <label>Publish status<select id="status" name="status"><option value="draft">Draft — visible only here</option><option value="published">Published — visible to the public</option></select></label>
+              <label class="form-span-2">Short summary<input id="summary" name="summary" maxlength="360" required placeholder="A clear one-sentence introduction for the impact card." /></label>
+              <label class="form-span-2">Story URL slug<input id="slug" name="slug" maxlength="100" placeholder="youth-table-tennis-summer-camp" /><small>Used in the public URL. Leave blank to create one from the title.</small></label>
+              <label>Event date<input id="event-date" name="event_date" type="date" /></label>
+              <label>Location<input id="location" name="location" maxlength="160" placeholder="Austin, Texas" /></label>
+              <label class="form-span-2">Story details<textarea id="body" name="body" rows="9" placeholder="Write the story in paragraphs. Leave a blank line between paragraphs."></textarea></label>
+              <label class="form-span-2">Foundation impact<textarea id="impact" name="impact" rows="5" placeholder="Describe the support provided and the difference it made."></textarea></label>
+            </div>
+            <section class="media-editor" id="media-editor" hidden>
+              <div><p class="eyebrow eyebrow-red">Photos</p><h3>Cover image &amp; gallery</h3><p>The cover appears in the rotating impact hero. Upload additional photos to create a blog-style gallery.</p></div>
+              <div class="upload-box"><label>Image file<input id="image-file" type="file" accept="image/jpeg,image/png,image/webp" /></label><label>Alt text<input id="image-alt" maxlength="240" placeholder="Describe the photo for visitors" /></label><label>Caption <span class="optional">optional</span><input id="image-caption" maxlength="600" placeholder="What is happening in this photo?" /></label><div class="upload-actions"><label class="checkbox-label"><input id="is-cover" type="checkbox" /> Use as cover image</label><button class="button button-small" id="upload-image" type="button">Upload photo</button></div><p class="upload-help">JPG, PNG, or WebP, up to 8 MB.</p></div>
+              <div id="gallery" class="admin-gallery"></div>
+            </section>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
