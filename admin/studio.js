@@ -1,4 +1,6 @@
-const api = "/api/admin";
+// Keep editor requests beneath /admin/ so one Cloudflare Access application
+// protects both the interface and its authenticated API session.
+const api = "/admin/api";
 const form = document.querySelector("#story-form");
 const notice = document.querySelector("#notice");
 const storyList = document.querySelector("#story-list");
