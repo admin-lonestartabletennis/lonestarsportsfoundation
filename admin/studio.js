@@ -75,14 +75,26 @@ function renderHeroFraming(story) {
   if (!story.cover_key) { heroFraming.hidden = true; return; }
   heroFraming.hidden = false;
   const preview = document.querySelector("#hero-framing-preview");
-  preview.src = `/media/${story.cover_key}`;
+  const coverImage = story.images.find((image) => image.object_key === story.cover_key);
+  preview.src = coverImage?.url || `/media/${story.cover_key}`;
   preview.alt = story.cover_alt || "Cover image crop preview";
+  preview.onerror = () => message("The selected cover image could not be loaded. Choose a gallery image as the cover below.", "is-error");
   updateHeroPreview();
 }
 
 function renderGallery(story) {
   const gallery = document.querySelector("#gallery");
-  gallery.innerHTML = story.images.length ? story.images.map((image) => `<figure class="admin-photo"><img src="${image.url}" alt="${escapeHtml(image.alt_text)}" /><figcaption>${escapeHtml(image.caption || image.alt_text || "Untitled image")}</figcaption><button type="button" class="remove-image" data-image-id="${image.id}">Remove photo</button></figure>`).join("") : "<p class=\"empty-state\">Upload a cover image, then add supporting gallery photos.</p>";
+  gallery.innerHTML = story.images.length ? story.images.map((image) => `<figure class="admin-photo"><img src="${image.url}" alt="${escapeHtml(image.alt_text)}" /><figcaption>${escapeHtml(image.caption || image.alt_text || "Untitled image")}</figcaption><button type="button" class="set-cover-image" data-image-id="${image.id}" ${image.object_key === story.cover_key ? "disabled" : ""}>${image.object_key === story.cover_key ? "Current cover image" : "Use as cover image"}</button><button type="button" class="remove-image" data-image-id="${image.id}">Remove photo</button></figure>`).join("") : "<p class=\"empty-state\">Upload a cover image, then add supporting gallery photos.</p>";
+  gallery.querySelectorAll(".set-cover-image").forEach((button) => button.addEventListener("click", async () => {
+    const image = story.images.find((item) => item.id === button.dataset.imageId);
+    if (!image) return;
+    try {
+      await request(`${api}/stories/${story.id}`, { method: "PUT", body: JSON.stringify({ ...payload(), cover_key: image.object_key, cover_alt: image.alt_text }) });
+      await openStory(story.id);
+      await refreshList();
+      message("Cover image updated. Adjust the framing controls, then save the story.", "is-success");
+    } catch (err) { message(err.message, "is-error"); }
+  }));
   gallery.querySelectorAll(".remove-image").forEach((button) => button.addEventListener("click", async () => { if (!confirm("Remove this photo from the story?")) return; try { await request(`${api}/images/${button.dataset.imageId}`, { method: "DELETE" }); await openStory(currentStory.id); message("Photo removed.", "is-success"); } catch (err) { message(err.message, "is-error"); } }));
 }
 
