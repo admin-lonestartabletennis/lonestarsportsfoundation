@@ -914,7 +914,11 @@ a {
 .admin-photo { margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; }
 .admin-photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .admin-photo figcaption { min-height: 52px; padding: 10px 12px; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
-.remove-image { width: calc(100% - 24px); margin: 0 12px 12px; padding: 8px; border: 1px solid rgba(126, 29, 29, 0.3); border-radius: 8px; background: #fff; color: #7e1d1d; cursor: pointer; font: inherit; font-weight: 700; }
+.set-cover-image,
+.remove-image { width: calc(100% - 24px); margin: 0 12px 10px; padding: 8px; border-radius: 8px; background: #fff; cursor: pointer; font: inherit; font-weight: 700; }
+.set-cover-image { border: 1px solid rgba(198, 40, 40, 0.35); color: var(--accent); }
+.set-cover-image:disabled { border-color: var(--line); color: var(--muted); cursor: default; }
+.remove-image { margin-bottom: 12px; border: 1px solid rgba(126, 29, 29, 0.3); color: #7e1d1d; }
 
 .content-stack {
   display: grid;
