@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS stories (
   cover_alt TEXT NOT NULL DEFAULT '',
   cover_focal_x INTEGER NOT NULL DEFAULT 50,
   cover_focal_y INTEGER NOT NULL DEFAULT 50,
+  cover_zoom INTEGER NOT NULL DEFAULT 100,
+  cover_aspect TEXT NOT NULL DEFAULT '16:9',
   published_at TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,

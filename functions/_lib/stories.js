@@ -14,6 +14,8 @@ export function storySummary(story) {
     cover_alt: story.cover_alt,
     cover_focal_x: story.cover_focal_x ?? 50,
     cover_focal_y: story.cover_focal_y ?? 50,
+    cover_zoom: story.cover_zoom ?? 100,
+    cover_aspect: story.cover_aspect ?? "16:9",
     cover_url: imageUrl(story.cover_key),
     published_at: story.published_at,
     updated_at: story.updated_at

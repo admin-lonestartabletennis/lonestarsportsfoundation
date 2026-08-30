@@ -51,7 +51,7 @@ async function openStory(id) {
   try {
     const { story } = await request(`${api}/stories/${id}`);
     currentStory = story; setValue("story-id", story.id); setValue("title", story.title); setValue("slug", story.slug); setValue("summary", story.summary); setValue("event-date", story.event_date); setValue("location", story.location); setValue("status", story.status); setValue("body", story.body); setValue("impact", story.impact);
-    setValue("cover-focal-x", story.cover_focal_x ?? 50); setValue("cover-focal-y", story.cover_focal_y ?? 50);
+    setValue("cover-focal-x", story.cover_focal_x ?? 50); setValue("cover-focal-y", story.cover_focal_y ?? 50); setValue("cover-zoom", story.cover_zoom ?? 100); setValue("cover-aspect", story.cover_aspect ?? "16:9");
     document.querySelector("#form-heading").textContent = story.title; document.querySelector("#delete-story").hidden = false; mediaEditor.hidden = false; renderList(); renderGallery(story); renderHeroFraming(story); message("");
   } catch (err) { message(err.message, "is-error"); }
 }
@@ -59,9 +59,16 @@ async function openStory(id) {
 function updateHeroPreview() {
   const x = value("cover-focal-x") || "50";
   const y = value("cover-focal-y") || "50";
+  const zoom = value("cover-zoom") || "100";
+  const aspect = value("cover-aspect") || "16:9";
   document.querySelector("#cover-focal-x-output").textContent = `${x}%`;
   document.querySelector("#cover-focal-y-output").textContent = `${y}%`;
-  document.querySelector("#hero-framing-preview").style.objectPosition = `${x}% ${y}%`;
+  document.querySelector("#cover-zoom-output").textContent = `${zoom}%`;
+  const preview = document.querySelector("#hero-framing-preview");
+  preview.style.objectPosition = `${x}% ${y}%`;
+  preview.style.transform = `scale(${Number(zoom) / 100})`;
+  preview.style.transformOrigin = `${x}% ${y}%`;
+  document.querySelector(".hero-framing-preview").style.aspectRatio = aspect.replace(":", " / ");
 }
 
 function renderHeroFraming(story) {
@@ -79,7 +86,7 @@ function renderGallery(story) {
   gallery.querySelectorAll(".remove-image").forEach((button) => button.addEventListener("click", async () => { if (!confirm("Remove this photo from the story?")) return; try { await request(`${api}/images/${button.dataset.imageId}`, { method: "DELETE" }); await openStory(currentStory.id); message("Photo removed.", "is-success"); } catch (err) { message(err.message, "is-error"); } }));
 }
 
-function payload() { return { title: value("title"), slug: value("slug"), summary: value("summary"), event_date: value("event-date"), location: value("location"), status: value("status"), body: value("body"), impact: value("impact"), cover_focal_x: Number(value("cover-focal-x") || 50), cover_focal_y: Number(value("cover-focal-y") || 50) }; }
+function payload() { return { title: value("title"), slug: value("slug"), summary: value("summary"), event_date: value("event-date"), location: value("location"), status: value("status"), body: value("body"), impact: value("impact"), cover_focal_x: Number(value("cover-focal-x") || 50), cover_focal_y: Number(value("cover-focal-y") || 50), cover_zoom: Number(value("cover-zoom") || 100), cover_aspect: value("cover-aspect") || "16:9" }; }
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -92,6 +99,8 @@ form.addEventListener("submit", async (event) => {
 document.querySelector("#new-story").addEventListener("click", resetForm);
 document.querySelector("#cover-focal-x").addEventListener("input", updateHeroPreview);
 document.querySelector("#cover-focal-y").addEventListener("input", updateHeroPreview);
+document.querySelector("#cover-zoom").addEventListener("input", updateHeroPreview);
+document.querySelector("#cover-aspect").addEventListener("change", updateHeroPreview);
 document.querySelector("#delete-story").addEventListener("click", async () => { if (!currentStory || !confirm(`Delete “${currentStory.title}” and all of its photos? This cannot be undone.`)) return; try { await request(`${api}/stories/${currentStory.id}`, { method: "DELETE" }); await refreshList(); resetForm(); message("Story deleted.", "is-success"); } catch (err) { message(err.message, "is-error"); } });
 document.querySelector("#upload-image").addEventListener("click", async () => { const file = document.querySelector("#image-file").files[0]; if (!file || !currentStory) return message("Choose an image first.", "is-error"); const data = new FormData(); data.append("image", file); data.append("story_id", currentStory.id); data.append("alt_text", value("image-alt")); data.append("caption", value("image-caption")); data.append("is_cover", document.querySelector("#is-cover").checked); try { await request(`${api}/media`, { method: "POST", body: data }); document.querySelector("#image-file").value = ""; setValue("image-alt"); setValue("image-caption"); document.querySelector("#is-cover").checked = false; await openStory(currentStory.id); await refreshList(); message("Photo uploaded.", "is-success"); } catch (err) { message(err.message, "is-error"); } });
 

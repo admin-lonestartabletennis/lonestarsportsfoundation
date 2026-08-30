@@ -6,6 +6,8 @@ The site now includes a protected editorial area at `/login` (redirects to `/adm
 
 If you created `lsf-impact` before the hero framing controls were added, open the D1 **Console** and run [`db/migrations/002_add_story_cover_focal_point.sql`](./db/migrations/002_add_story_cover_focal_point.sql) once before deploying this update. New databases created with [`db/schema.sql`](./db/schema.sql) already include these columns.
 
+For zoom and hero crop-shape controls, run [`db/migrations/003_add_story_cover_crop_controls.sql`](./db/migrations/003_add_story_cover_crop_controls.sql) once after migration 002.
+
 ## 1. Create the data services
 
 In the Cloudflare dashboard, select the same account that owns `lonestarsportsfoundation.org`.

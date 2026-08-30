@@ -2,6 +2,10 @@ import { requireEditor } from "../../../_lib/auth.js";
 import { cleanText, error, json, safeSlug } from "../../../_lib/http.js";
 import { getImages, storySummary } from "../../../_lib/stories.js";
 
+const VALID_ASPECTS = new Set(["16:9", "3:2", "2:1", "4:3"]);
+const coverZoom = (value) => Math.min(200, Math.max(100, Number(value) || 100));
+const coverAspect = (value) => VALID_ASPECTS.has(value) ? value : "16:9";
+
 async function storyOr404(env, id) {
   return env.DB.prepare("SELECT * FROM stories WHERE id = ?").bind(id).first();
 }
@@ -31,10 +35,10 @@ export async function onRequestPut(context) {
   const publishedAt = status === "published" ? (current.published_at || now) : null;
   try {
     await context.env.DB.prepare(
-      `UPDATE stories SET slug=?, title=?, summary=?, body=?, impact=?, event_date=?, location=?, status=?, cover_key=?, cover_alt=?, cover_focal_x=?, cover_focal_y=?, updated_at=?, published_at=?, updated_by=? WHERE id=?`
+      `UPDATE stories SET slug=?, title=?, summary=?, body=?, impact=?, event_date=?, location=?, status=?, cover_key=?, cover_alt=?, cover_focal_x=?, cover_focal_y=?, cover_zoom=?, cover_aspect=?, updated_at=?, published_at=?, updated_by=? WHERE id=?`
     ).bind(slug, title, summary, cleanText(input.body), cleanText(input.impact, 3000), cleanText(input.event_date, 30) || null,
       cleanText(input.location, 160) || null, status, coverKey, cleanText(input.cover_alt, 240),
-      Math.min(100, Math.max(0, Number(input.cover_focal_x) || 50)), Math.min(100, Math.max(0, Number(input.cover_focal_y) || 50)),
+      Math.min(100, Math.max(0, Number(input.cover_focal_x) || 50)), Math.min(100, Math.max(0, Number(input.cover_focal_y) || 50)), coverZoom(input.cover_zoom), coverAspect(input.cover_aspect),
       now, publishedAt, auth.email, current.id).run();
     const story = await storyOr404(context.env, current.id);
     return json({ story: storySummary(story) });
