@@ -11,11 +11,17 @@ const DEFAULT_EDITORS = new Set([
 
 function configuredEditors(env) {
   if (!env.EDITOR_EMAILS) return DEFAULT_EDITORS;
-  return new Set(env.EDITOR_EMAILS.split(",").map((email) => email.trim().toLowerCase()).filter(Boolean));
+  return new Set(
+    env.EDITOR_EMAILS.split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  );
 }
 
-export async function requireEditor(context) {
-  const { request, env } = context;
+/**
+ * Validate the Cloudflare Access JWT and ensure the caller is an approved editor.
+ */
+export async function requireEditor(request, env) {
   const token = request.headers.get("cf-access-jwt-assertion");
   const audience = env.CF_ACCESS_API_AUD;
   const teamDomain = env.CF_ACCESS_TEAM_DOMAIN;

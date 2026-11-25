@@ -19,12 +19,21 @@ function rotateHero(stories) {
   const images = stories.map((story) => story.cover_url).filter(Boolean);
   if (!images.length) return;
   let index = 0;
-  const show = () => { const story = stories.find((item) => item.cover_url === images[index]); hero.style.backgroundImage = `linear-gradient(90deg, rgba(10, 14, 20, 0.8), rgba(10, 14, 20, 0.35)), url("${images[index]}")`; hero.style.backgroundPosition = `center, ${story?.cover_focal_x ?? 50}% ${story?.cover_focal_y ?? 50}%`; };
-  show();
+  const show = () => {
+    const story = stories.find((item) => item.cover_url === images[index]);
+    hero.style.backgroundImage = `linear-gradient(90deg, rgba(10, 14, 20, 0.8), rgba(10, 14, 20, 0.35)), url("${images[index]}")`;
+    hero.style.backgroundPosition = `center, ${story?.cover_focal_x ?? 50}% ${story?.cover_focal_y ?? 50}%`;
+  };
+  if (!hero.style.backgroundImage.includes(images[0])) {
+    show();
+  }
   if (images.length > 1) setInterval(() => { index = (index + 1) % images.length; show(); }, 6500);
 }
 
-fetch("/api/stories/")
-  .then((response) => response.ok ? response.json() : Promise.reject())
+const loadStories = window.__IMPACT_STORIES__
+  ? Promise.resolve(window.__IMPACT_STORIES__)
+  : fetch("/api/stories/").then((response) => response.ok ? response.json() : Promise.reject());
+
+loadStories
   .then(({ stories }) => { if (stories?.length) { renderStories(stories); rotateHero(stories); } })
   .catch(() => {});

@@ -1,6 +1,6 @@
 # Lonestar Sports Foundation
 
-Static frontend for `https://lonestarsportsfoundation.org/`.
+Static frontend and Cloudflare Worker backend for `https://lonestarsportsfoundation.org/`.
 
 ## Local development
 
@@ -10,44 +10,44 @@ Static frontend for `https://lonestarsportsfoundation.org/`.
    npm install
    ```
 
-2. Start the frontend:
+2. Start the static frontend (fast Vite HMR):
 
    ```bash
    npm run dev
    ```
 
-3. Open the local URL shown by Vite, usually:
+3. Or build and run the full Cloudflare Worker (static assets + APIs + D1 + R2) locally:
 
-   ```text
-   http://localhost:5173
+   ```bash
+   npm run dev:worker
    ```
 
-## Production build
+   To seed a local D1 database for `dev:worker`:
+
+   ```bash
+   npx wrangler d1 execute lsf-impact --local --file=db/schema.sql
+   ```
+
+## Production build & deploy
 
 ```bash
 npm run build
+npm run deploy
 ```
 
-The built static files are written to `dist/`.
+`npm run build` writes the static site to `dist/`. `npm run deploy` builds `dist/` and deploys both static assets and `src/worker.js` using `wrangler.jsonc`.
 
-## Cloudflare Pages setup
+## Cloudflare Workers setup
 
-- Framework preset: `None`
-- Build command: `npm run build`
-- Build output directory: `dist`
-- Root directory: `/`
-
-Then attach the custom domain `lonestarsportsfoundation.org` to the Pages project after verifying the `pages.dev` preview.
-
-## Deployment note
-
-After connecting the GitHub repository to Cloudflare Pages, any new commit pushed to the tracked branch will trigger a fresh Pages build and deployment.
+- Entrypoint: `src/worker.js`
+- Configuration: `wrangler.jsonc`
+- Build command (Workers Builds): `npm run build`
+- Deploy command (Workers Builds): `npx wrangler deploy`
+- Detailed D1, R2, and Cloudflare Access setup: [`CLOUDFLARE_SETUP.md`](./CLOUDFLARE_SETUP.md)
 
 ## Production release tagging
 
-The production branch is `main`. Cloudflare Pages deploys when a commit is merged or pushed to
-`main`; Git tags do not trigger a deployment. Create a tag only after the production deployment
-has completed successfully and the live site has been verified.
+The production branch is `main`. Create a tag only after the production deployment has completed successfully and the live site has been verified.
 
 ```bash
 git checkout main
@@ -59,10 +59,8 @@ git push origin vYYYY.MM.DD
 For example:
 
 ```bash
-git tag -a v2026.08.29 -m "Impact Studio release"
+git tag -a v2026.08.29 -m "Workers migration release"
 git push origin v2026.08.29
 ```
 
-Use the tag in GitHub to create a Release if release notes are needed. If a production deployment
-has an issue, use Cloudflare Pages' rollback option first, then revert the relevant GitHub pull
-request so the next deployment remains correct.
+Use the tag in GitHub to create a Release if release notes are needed. If a production deployment has an issue, roll back the Worker deployment in the Cloudflare dashboard first, then revert the relevant GitHub pull request so the next deployment remains correct.
