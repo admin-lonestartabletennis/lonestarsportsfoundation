@@ -1,6 +1,6 @@
-# Impact Studio deployment setup
+# Impact Studio deployment setup (Cloudflare Workers)
 
-The site now includes a protected editorial area at `/login` (redirects to `/admin/`), public story pages at `/impact/stories/<slug>`, and Pages Functions that store story data in D1 and photos in R2.
+The site runs on **Cloudflare Workers with Static Assets** (`wrangler.jsonc` + `src/worker.js`): Vite builds the static site into `dist/`, and the Worker handles dynamic API, media, login, and story routes backed by D1 and R2.
 
 ## Existing database update
 
@@ -8,26 +8,18 @@ If you created `lsf-impact` before the hero framing controls were added, open th
 
 For zoom and hero crop-shape controls, run [`db/migrations/003_add_story_cover_crop_controls.sql`](./db/migrations/003_add_story_cover_crop_controls.sql) once after migration 002.
 
-## 1. Create the data services
+## 1. Create or reuse the data services
 
-In the Cloudflare dashboard, select the same account that owns `lonestarsportsfoundation.org`.
+In the Cloudflare dashboard, select the same account that owns `lonestarsportsfoundation.org`:
 
-1. Go to **Storage & databases > D1 SQL Database** and create a database named `lsf-impact`.
-2. Open the new database, choose **Console**, and run the contents of [`db/schema.sql`](./db/schema.sql).
-3. Go to **Storage & databases > R2** and create a standard-storage bucket named `lsf-story-media`.
+1. Go to **Storage & databases > D1 SQL Database** and create (or locate) the database named `lsf-impact`.
+2. If creating a fresh database, open **Console** and run the contents of [`db/schema.sql`](./db/schema.sql).
+3. Copy the **Database ID** of `lsf-impact` and set it in [`wrangler.jsonc`](./wrangler.jsonc) (`d1_databases[0].database_id`). You can also look it up with `npx wrangler d1 list`.
+4. Go to **Storage & databases > R2** and ensure the standard-storage bucket named `lsf-story-media` exists.
 
-## 2. Bind them to the Pages project
+No public R2 bucket or custom R2 domain is needed. The Worker serves images through `/media/` with safe cache headers.
 
-Go to **Workers & Pages > your Pages project > Settings > Bindings**. Add bindings for both Preview and Production:
-
-| Binding type | Variable name | Resource |
-| --- | --- | --- |
-| D1 database | `DB` | `lsf-impact` |
-| R2 bucket | `STORY_MEDIA` | `lsf-story-media` |
-
-No public R2 bucket or custom R2 domain is needed. The site serves images through the `/media/` function route with safe cache headers.
-
-## 3. Protect editor routes with Cloudflare Access
+## 2. Protect editor routes with Cloudflare Access
 
 Create one **Zero Trust > Access controls > Applications** application. Use **Self-hosted and private**, the Google Workspace identity provider, and the `Impact Studio editors` Allow policy.
 
@@ -45,11 +37,11 @@ siva@lonestarsportsfoundation.org
 kai@lonestarsportsfoundation.org
 ```
 
-From the **Impact Studio** application, copy its **Application Audience (AUD) Tag**. This is required by the API's second-layer JWT validation.
+From the **Impact Studio** application, copy its **Application Audience (AUD) Tag**. This is required by the Worker's second-layer JWT validation.
 
-## 4. Add Pages environment variables
+## 3. Add Worker environment variables / secrets
 
-In **Workers & Pages > your Pages project > Settings > Environment variables**, add the following variables for Preview and Production:
+In **Compute (Workers) > Workers & Pages > lonestarsportsfoundation > Settings > Variables and Secrets** (or via `npx wrangler secret put`), add:
 
 | Variable | Value |
 | --- | --- |
@@ -59,15 +51,17 @@ In **Workers & Pages > your Pages project > Settings > Environment variables**, 
 
 `CF_ACCESS_TEAM_DOMAIN` must include `https://` and must not have a trailing slash. Do not add Google Client IDs or Client Secrets to this project; those remain in Cloudflare Zero Trust.
 
-## 5. Deploy and test
+For local Worker testing, place these same values in `.dev.vars` (git-ignored).
 
-Pages Functions require a Git-connected Pages deployment or Wrangler deployment; dashboard Direct Upload does not deploy the `functions/` directory.
+## 4. Deploy and connect the custom domain
 
-After this repository is deployed:
+1. Build and deploy with Wrangler (or connect GitHub via **Workers Builds** with build command `npm run build` and deploy command `npx wrangler deploy`):
 
-1. Visit `https://lonestarsportsfoundation.org/login` in a private browser window.
-2. Sign in with one of the five approved Workspace accounts.
-3. Create a draft, save it, upload a cover image and additional gallery images, then change its status to Published.
-4. Confirm it appears at `/impact/`, that its cover can rotate into the hero, and that its direct public URL works.
+   ```bash
+   npm run deploy
+   ```
 
-The build output includes `public/_routes.json`, which limits Pages Function calls to dynamic API, media, login, and story routes. The rest of the site remains static.
+2. In **Workers & Pages > lonestarsportsfoundation > Settings > Domains & Routes**, attach the custom domain `lonestarsportsfoundation.org` (and `www.lonestarsportsfoundation.org` if desired) once you detach it from the old Pages project.
+3. Visit `https://lonestarsportsfoundation.org/login` in a private browser window, sign in with an approved Google Workspace account, and verify `/admin/`, `/impact/`, and `/impact/stories/<slug>`.
+
+[`wrangler.jsonc`](./wrangler.jsonc) configures `run_worker_first` only for `/api/*`, `/admin/api/*`, `/media/*`, `/impact/stories/*`, and `/login`, so all static pages and assets continue to serve directly without invoking the Worker.

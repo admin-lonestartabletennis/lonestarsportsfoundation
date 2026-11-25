@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "lonestarsportsfoundation",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-24",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*",
+      "/admin/api/*",
+      "/media/*",
+      "/impact",
+      "/impact/",
+      "/impact/stories/*",
+      "/login"
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lsf-impact",
+      "database_id": "58ca6652-478f-4569-b25b-c6bd70af8e7f"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "STORY_MEDIA",
+      "bucket_name": "lsf-story-media"
+    }
+  ]
+}

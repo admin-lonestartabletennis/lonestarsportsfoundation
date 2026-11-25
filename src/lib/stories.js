@@ -24,7 +24,9 @@ export function storySummary(story) {
 
 export async function getImages(db, storyId) {
   const result = await db
-    .prepare("SELECT id, object_key, alt_text, caption, position FROM story_images WHERE story_id = ? ORDER BY position ASC, created_at ASC")
+    .prepare(
+      "SELECT id, object_key, alt_text, caption, position FROM story_images WHERE story_id = ? ORDER BY position ASC, created_at ASC"
+    )
     .bind(storyId)
     .all();
   return result.results.map((image) => ({ ...image, url: imageUrl(image.object_key) }));
@@ -32,7 +34,15 @@ export async function getImages(db, storyId) {
 
 export async function getStoryBySlug(db, slug, includeDraft = false) {
   const condition = includeDraft ? "" : " AND status = 'published'";
-  const story = await db.prepare(`SELECT * FROM stories WHERE slug = ?${condition}`).bind(slug).first();
+  const story = await db
+    .prepare(`SELECT * FROM stories WHERE slug = ?${condition}`)
+    .bind(slug)
+    .first();
   if (!story) return null;
-  return { ...storySummary(story), body: story.body, impact: story.impact, images: await getImages(db, story.id) };
+  return {
+    ...storySummary(story),
+    body: story.body,
+    impact: story.impact,
+    images: await getImages(db, story.id)
+  };
 }

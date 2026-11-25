@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 4173",
+    "dev:worker": "vite build && wrangler dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vite build && wrangler deploy"
   },
   "devDependencies": {
-    "vite": "^8.0.14"
+    "vite": "^8.0.14",
+    "wrangler": "^4.168.0"
   },
   "dependencies": {
     "jose": "^6.2.10"
